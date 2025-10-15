@@ -44,16 +44,16 @@ class TimeTravelCore:
             with open(path, 'r') as f:
                 self._config = json.load(f)
             
-            # Extract prim mapping
-            self._prim_map = self._config.get('prim_map', {}) # {objid: prim_path} 가져옴
+            # Store config directory for relative paths
+            self._config_dir = path.parent
+            
+            # Extract prim mapping (will be overridden if auto_generate is enabled)
+            self._prim_map = self._config.get('prim_map', {})
             
             # Extract event summary
-            # 이벤트 타임스탬프 리스트 가져옴. 현재는 이벤트 서머리에 타임스탬프 뿐이지만, 위치도 포함 예정
-            self._event_summary = self._config.get('event_summary', []) 
-            if not self._event_summary:
-                carb.log_info("[TimeTravel] No events defined in config")
+            self._event_summary = self._config.get('event_summary', [])
             
-            carb.log_info(f"[TimeTravel] Config loaded: {len(self._prim_map)} mappings, {len(self._event_summary)} events")
+            carb.log_info(f"[TimeTravel] Config loaded")
             return True
             
         except Exception as e:
@@ -118,12 +118,12 @@ class TimeTravelCore:
             # "2025-01-01T00:00:00Z" -> "2025-01-01T00:00:00+00:00" -> Datetime 객체
             return datetime.datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
         except:
-            # timestamp_str이 "2025-01-01 00:00:00" 형식일 때 datetime 객체로 변환
-            return datetime.datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+            # CSV format: "2025-01-01 00:00:00.000"
+            return datetime.datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f")
     
     def _format_timestamp(self, dt: datetime.datetime) -> str:
         """Format datetime to timestamp string matching data format."""
-        return dt.strftime("%Y-%m-%dT%H:%M:%S")
+        return dt.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
     
     def set_time_range(self, start_time: datetime.datetime, end_time: datetime.datetime) -> bool:
         """Set user-defined time range with validation."""
@@ -175,8 +175,9 @@ class TimeTravelCore:
         Removed microseconds for matching.
         Adjust matching second unit as needed.
         """
-        # Normalize to seconds (remove microseconds) 여기서 매칭 단위 설정
-        normalized_time = timestamp.replace(microsecond=0)
+        # Normalize to milliseconds (remove microseconds beyond milliseconds)
+        # .123456 → .123000 (마이크로초 부분 제거)
+        normalized_time = timestamp.replace(microsecond=(timestamp.microsecond // 1000) * 1000)
         timestamp_str = self._format_timestamp(normalized_time)
         
         # Check if exact timestamp exists
@@ -214,6 +215,9 @@ class TimeTravelCore:
         # Get data for current time
         data = self.get_data_at_time(self._current_time)
         
+        if not data:
+            return
+        
         # Update each mapped object
         for objid, prim_path in self._prim_map.items():
             if objid not in data:
@@ -222,27 +226,23 @@ class TimeTravelCore:
             try:
                 prim = self._stage.GetPrimAtPath(prim_path)
                 if not prim or not prim.IsValid():
-                    carb.log_warn(f"[TimeTravel] Prim not found: {prim_path}")
                     continue
                 
                 # Get position from data
                 x, y, z = data[objid]
                 
-                # Update only xformOp:translate, preserve existing transforms
+                # Update translate
                 xformable = UsdGeom.Xformable(prim)
                 if xformable:
-                    # Try to find existing translate op
                     translate_op = None
                     for op in xformable.GetOrderedXformOps():
                         if op.GetOpType() == UsdGeom.XformOp.TypeTranslate:
                             translate_op = op
                             break
                     
-                    # If no translate op exists, add one but preserve xformOpOrder
                     if not translate_op:
                         translate_op = xformable.AddTranslateOp()
                     
-                    # Update the translate value
                     translate_op.Set(Gf.Vec3d(x, y, z))
                     
             except Exception as e:
@@ -377,3 +377,131 @@ class TimeTravelCore:
     def get_summary_events(self) -> List[str]:
         """Get list of event timestamps (API for future AI integration)."""
         return self._event_summary.copy()
+    
+    def parse_unique_objids(self, csv_path: str) -> List[str]:
+        """Extract unique objids from CSV."""
+        objids = set()
+        try:
+            with open(csv_path, 'r') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if 'objid' in row:
+                        objids.add(row['objid'])
+            return sorted(list(objids))
+        except Exception as e:
+            carb.log_error(f"[TimeTravel] Failed to parse objids: {e}")
+            return []
+    
+    def clear_timetravel_objects(self):
+        """Clear existing TimeTravel_Objects."""
+        if not self._stage:
+            self._stage = self._usd_context.get_stage()
+        
+        parent_path = "/World/TimeTravel_Objects"
+        parent_prim = self._stage.GetPrimAtPath(parent_path)
+        
+        if parent_prim and parent_prim.IsValid():
+            for child in parent_prim.GetChildren():
+                self._stage.RemovePrim(child.GetPath())
+    
+    def create_astronaut_prim(self, index: int) -> str:
+        """Create Astronaut prim with Reference."""
+        if not self._stage:
+            self._stage = self._usd_context.get_stage()
+        
+        # Get astronaut USD path from config
+        astronaut_usd = self._config.get('astronaut_usd', '')
+        if not astronaut_usd:
+            carb.log_error("[TimeTravel] astronaut_usd not specified in config")
+            return ""
+        
+        # Ensure parent exists
+        parent_path = "/World/TimeTravel_Objects"
+        if not self._stage.GetPrimAtPath(parent_path):
+            self._stage.DefinePrim(parent_path, "Xform")
+        
+        # Create astronaut prim
+        prim_path = f"{parent_path}/Astronaut{index:03d}"
+        prim = self._stage.DefinePrim(prim_path, "Xform")
+        
+        # Add reference
+        from pxr import Sdf, UsdGeom
+        references = prim.GetReferences()
+        references.AddReference(
+            assetPath=astronaut_usd,
+            primPath=Sdf.Path("/Root")
+        )
+        
+        # Setup transform ops: translate -> rotate -> scale
+        xformable = UsdGeom.Xformable(prim)
+        
+        # 1. Translate first
+        translate_op = xformable.AddTranslateOp()
+        translate_op.Set(Gf.Vec3d(0, 0, 0))
+        
+        # 2. Rotate second
+        rotate_xyz_op = xformable.AddRotateXYZOp()
+        rotate_xyz_op.Set(Gf.Vec3f(-90.0, 0.0, 0.0))
+        
+        # 3. Scale third
+        scale_op = xformable.AddScaleOp()
+        scale_op.Set(Gf.Vec3f(1.0, 1.0, 1.0))
+        
+        return prim_path
+    
+    def auto_generate_astronauts(self) -> Dict[str, str]:
+        """Auto-generate Astronaut prims and create mapping."""
+        # Get CSV path
+        data_path = self._config.get('data_path', '')
+        if not Path(data_path).is_absolute():
+            csv_path = self._config_dir / data_path.lstrip('./')
+        else:
+            csv_path = Path(data_path)
+        
+        if not csv_path.exists():
+            carb.log_error(f"[TimeTravel] Data file not found: {csv_path}")
+            return {}
+        
+        # Parse objids
+        objids = self.parse_unique_objids(str(csv_path))
+        if not objids:
+            carb.log_error("[TimeTravel] No objids found in CSV")
+            return {}
+        
+        carb.log_info(f"[TimeTravel] Auto-generating {len(objids)} Astronauts")
+        
+        # Clear existing
+        self.clear_timetravel_objects()
+        
+        # Create astronauts and mapping
+        prim_map = {}
+        for i, objid in enumerate(objids, start=1):
+            prim_path = self.create_astronaut_prim(i)
+            if prim_path:
+                prim_map[objid] = prim_path
+                carb.log_info(f"  {objid} -> {prim_path}")
+        
+        carb.log_info(f"[TimeTravel] Created {len(prim_map)} Astronauts")
+        
+        # Hide all cameras in the stage
+        self.hide_all_cameras()
+        
+        return prim_map
+    
+    def hide_all_cameras(self):
+        """Hide all camera prims in the stage."""
+        if not self._stage:
+            self._stage = self._usd_context.get_stage()
+        
+        if not self._stage:
+            return
+        
+        camera_count = 0
+        for prim in self._stage.Traverse():
+            if prim.IsA(UsdGeom.Camera):
+                imageable = UsdGeom.Imageable(prim)
+                imageable.MakeInvisible()
+                camera_count += 1
+        
+        if camera_count > 0:
+            carb.log_info(f"[TimeTravel] Hidden {camera_count} cameras")

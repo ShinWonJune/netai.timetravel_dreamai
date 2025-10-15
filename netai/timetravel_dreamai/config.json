@@ -1,10 +1,12 @@
 {
-  "data_path": "./data/merged_trajectory.csv",
-  "prim_map": {
-    "obj001": "/World/Equipment/Included_In_AI_Grad_Building_usd/Astronaut001",
-    "obj002": "/World/Equipment/Included_In_AI_Grad_Building_usd/Astronaut002"
-
-  },
+  "data_path": "./data/trajectory_10min_0.5s.csv",
+  
+  "auto_generate": true,
+  
+  "astronaut_usd": "omniverse://10.38.38.32/Projects/Dream-AI_Plus_Twin/Workspace_Personal/swj/AI-Grad_Building/Human/Astronaut.usd",
+  
+  "prim_map": {},
+  
   "event_summary": [
     "2025-01-01T00:01:00",
     "2025-01-01T00:10:30",

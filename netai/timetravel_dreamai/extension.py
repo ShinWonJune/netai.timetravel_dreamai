@@ -28,11 +28,16 @@ class NetAITimetravelDreamAI(omni.ext.IExt):
         # Initialize core logic
         self._core = TimeTravelCore() 
         
-        # Load configuration and data
-        config_path = extension_dir / "config.json"  # 익스텐션 디렉터리 기준
+        # Load configuration
+        config_path = extension_dir / "config.json"
         
-        if self._core.load_config(str(config_path)): # self._core._config, self._core._prim_map 생성됨
-            self._core.load_data()  #self._core._data, self._core._timestamps 생성됨
+        if self._core.load_config(str(config_path)):
+            # Auto-generate astronauts if enabled
+            if self._core._config.get('auto_generate', False):
+                self._core._prim_map = self._core.auto_generate_astronauts()
+            
+            # Load data
+            self._core.load_data()
         
         # Create UI window
         self._window = TimeTravelWindow(self._core)
