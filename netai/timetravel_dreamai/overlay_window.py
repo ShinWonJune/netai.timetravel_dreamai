@@ -19,7 +19,7 @@ class OverlayControlWindow:
         self._window = ui.Window(
             "Overlay Control", 
             width=250, 
-            height=80,
+            height=120,
             visible=True
         )
         
@@ -37,6 +37,13 @@ class OverlayControlWindow:
                     self._time_checkbox.model.set_value(self._overlay.is_visible())
                     self._time_checkbox.model.add_value_changed_fn(self._on_time_display_changed)
                     ui.Label("Show Time Display", style={"font_size": 16})
+                
+                # Object ID display toggle
+                with ui.HStack(height=22):
+                    self._objid_checkbox = ui.CheckBox(width=18)
+                    self._objid_checkbox.model.set_value(True)
+                    self._objid_checkbox.model.add_value_changed_fn(self._on_objid_display_changed)
+                    ui.Label("Show Object IDs", style={"font_size": 16})
     
     def _on_time_display_changed(self, model):
         """Handle time display checkbox change."""
@@ -47,6 +54,16 @@ class OverlayControlWindow:
             carb.log_info("[OverlayControl] Time display enabled")
         else:
             carb.log_info("[OverlayControl] Time display disabled")
+    
+    def _on_objid_display_changed(self, model):
+        """Handle object ID display checkbox change."""
+        visible = model.get_value_as_bool()
+        self._overlay.set_object_ids_visible(visible)
+        
+        if visible:
+            carb.log_info("[OverlayControl] Object ID display enabled")
+        else:
+            carb.log_info("[OverlayControl] Object ID display disabled")
     
     def update_ui(self):
         """Update UI elements (called every frame if needed)."""

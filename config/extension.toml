@@ -25,6 +25,7 @@ repository = "https://github.com/NVIDIA-Omniverse/kit-app-template"  # URL of th
 "omni.kit.uiapp" = {}
 "omni.usd" = {}
 "omni.ui" = {}
+"omni.ui.scene" = {}
 "omni.timeline" = {}
 "omni.kit.pip_archive" = {}
 "omni.kit.pipapi" = {} 
