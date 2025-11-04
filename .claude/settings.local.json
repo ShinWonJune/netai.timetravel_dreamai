@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "WebFetch(domain:docs.omniverse.nvidia.com)"
+      "WebFetch(domain:docs.omniverse.nvidia.com)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []

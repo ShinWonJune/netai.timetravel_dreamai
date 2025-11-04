@@ -119,10 +119,18 @@ class NetAITimetravelDreamAI(omni.ext.IExt):
                 carb.log_error(f"[Extension] Error destroying window: {e}")
             self._window = None
         
+        # Clean up overlay window (OPTIONAL)
+        if hasattr(self, '_overlay_window') and self._overlay_window:
+            try:
+                self._overlay_window.destroy()
+            except Exception as e:
+                carb.log_error(f"[Extension] Error destroying overlay window: {e}")
+            self._overlay_window = None
+        
         # Clean up overlay (OPTIONAL)
         if hasattr(self, '_overlay') and self._overlay:
             try:
-                self._overlay.shutdown()
+                self._overlay.destroy()
             except Exception as e:
                 carb.log_error(f"[Extension] Error destroying overlay: {e}")
             self._overlay = None
