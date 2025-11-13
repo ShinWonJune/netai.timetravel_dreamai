@@ -178,8 +178,9 @@ class TimeTravelCore:
         # Normalize to milliseconds (remove microseconds beyond milliseconds)
         # .123456 → .123000 (마이크로초 부분 제거)
         normalized_time = timestamp.replace(microsecond=(timestamp.microsecond // 1000) * 1000)
+        # print(f"Normalized time: {normalized_time}")
         timestamp_str = self._format_timestamp(normalized_time)
-        
+        # print(f"Timestamp string: {timestamp_str}")
         # Check if exact timestamp exists
         if timestamp_str in self._data:
             return self._data[timestamp_str]

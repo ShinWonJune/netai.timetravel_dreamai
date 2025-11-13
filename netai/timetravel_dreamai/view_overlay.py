@@ -67,15 +67,17 @@ class ObjectIDManipulator(sc.Manipulator):
             with sc.Transform(look_at=sc.Transform.LookAt.CAMERA):
                 # White circle background
                 sc.Arc(
-                    radius=30,  # 원의 반지름
-                    color=0xFFFFFFFF,  # 하얀색
+                    radius=40,  # 원의 반지름 
+                    # color=0xFFFFFFFF,  # 하얀색
+                    color=0xFF000000,  # 검은색
                     thickness=40  # 꽉 찬 원을 만들기 위해 두껍게
                 )
                 # Draw label text on top
                 self._label = sc.Label(
                     self._label_text,
-                    color=0xFF000000,  # Black text
-                    size=28,
+                    # color=0xFF000000,  # Black text
+                    color=0xFFFFFFFF,  # White text
+                    size=24, #28 default
                     alignment=ui.Alignment.CENTER
                 )
         
@@ -129,7 +131,6 @@ class ViewOverlay:
         
         # Time display UI elements
         self._time_frame = None
-        self._date_label = None
         self._time_label = None
 
         # Subscribe to stage events
@@ -166,10 +167,10 @@ class ViewOverlay:
                     # Bottom-right corner positioning
                     with ui.HStack():
                         ui.Spacer()
-                        with ui.VStack(width=220):
+                        with ui.VStack(width=0):
                             ui.Spacer()
                             # Time display box
-                            with ui.ZStack(width=200, height=80):
+                            with ui.ZStack(width=0, height=40):
                                 # Background rectangle
                                 ui.Rectangle(
                                     style={
@@ -180,35 +181,22 @@ class ViewOverlay:
                                     }
                                 )
                                 
-                                # Date and Time text
-                                with ui.VStack(spacing=3):
-                                    ui.Spacer(height=10)
-                                    # Date label
+                                # Date and Time text in one line
+                                with ui.VStack(height=20):
+                                    ui.Spacer()
                                     with ui.HStack():
-                                        ui.Spacer(width=50)
-                                        self._date_label = ui.Label(
-                                            "2025-01-01",
-                                            style={
-                                                "font_size": 24,
-                                                "color": 0xFFCCCCCC,
-                                                "font_weight": "normal"
-                                            }
-                                        )
-                                        ui.Spacer()
-                                    # Time label
-                                    with ui.HStack():
-                                        ui.Spacer(width=50)
+                                        ui.Spacer(width=5)
                                         self._time_label = ui.Label(
                                             "00:00:00",
                                             style={
-                                                "font_size": 28,
+                                                "font_size": 24,
                                                 "color": 0xFFFFFFFF,
                                                 "font_weight": "bold"
                                             }
                                         )
-                                        ui.Spacer()
-                                    ui.Spacer(height=10)
-                            ui.Spacer(height=10)
+                                        ui.Spacer(width=5)
+                                    ui.Spacer()
+                            ui.Spacer(height=0)
                 
                 self._time_frame.visible = self._visible
                 carb.log_info("[ViewOverlay] Time display created")
@@ -270,7 +258,6 @@ class ViewOverlay:
             self._time_frame.clear()
             self._time_frame = None
         
-        self._date_label = None
         self._time_label = None
         
         carb.log_info("[ViewOverlay] Cleanup complete")
@@ -379,12 +366,10 @@ class ViewOverlay:
                 manipulator.update_position()
         
         # Update time display
-        if self._time_visible and self._time_label and self._date_label:
+        if self._time_visible and self._time_label:
             try:
                 current_time = self._core.get_current_time()
-                date_str = current_time.strftime("%Y-%m-%d")
                 time_str = current_time.strftime("%H:%M:%S")
-                self._date_label.text = date_str
                 self._time_label.text = time_str
             except Exception as e:
                 carb.log_error(f"[ViewOverlay] Error updating time: {e}")
