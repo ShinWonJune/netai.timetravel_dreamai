@@ -179,13 +179,13 @@ if __name__ == "__main__":
     print("예시 2: 5개 객체, 10분, 0.5초 간격")
     generator = TrajectoryGenerator(
         num_objects=4,
-        duration_minutes=1,
+        duration_minutes=60,
         interval_seconds=0.2,
         min_speed=150,
         max_speed=200
     )
     df2 = generator.generate()
-    df2.to_csv('../data/living_trajectory_5min_0.2s.csv', index=False)
+    df2.to_csv('../data/living_trajectory_60min_0.2s.csv', index=False)
     print(f"생성된 데이터: {len(df2)} rows")
     print(df2.head(10))
     print("\n" + "="*50 + "\n")
