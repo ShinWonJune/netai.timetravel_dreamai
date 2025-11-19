@@ -30,6 +30,10 @@ class TimeTravelCore:
         self._accumulated_time = 0.0
         self._use_event_summary = False
         
+        # Event playback state
+        self._event_playback_start_time = None  # When current event started playing
+        self._event_playback_duration = 1.0  # Play 1 second at each event
+        
         self._usd_context = omni.usd.get_context()
         self._stage = None
         
@@ -290,6 +294,10 @@ class TimeTravelCore:
         """Toggle play/pause state."""
         self._is_playing = not self._is_playing
         self._accumulated_time = 0.0
+        
+        # Reset event playback state when starting
+        if self._is_playing and self._use_event_summary:
+            self._event_playback_start_time = None
     
     def update(self, dt: float):
         """ 
@@ -308,8 +316,8 @@ class TimeTravelCore:
             self._accumulated_time = 0.0  # Reset accumulated time
             
             if self._use_event_summary and self._event_summary:
-                # Jump to next event
-                self._go_to_next_event()
+                # Event Summary Mode: Play 1 second at each event
+                self._update_event_playback(seconds_to_add)
             else:
                 # Normal playback
                 new_time = self._current_time + datetime.timedelta(seconds=seconds_to_add)
@@ -321,12 +329,46 @@ class TimeTravelCore:
                 self._current_time = new_time
                 self.update_stage_objects()
     
-    def _go_to_next_event(self):
-        """Jump to next event in summary."""
+    def _update_event_playback(self, dt: float):
+        """
+        Update playback in Event Summary Mode.
+        Plays 1 second at each event timestamp, then jumps to next event.
+        """
+        # Initialize event playback if not started
+        if self._event_playback_start_time is None:
+            # Go to current event timestamp
+            self._go_to_current_event()
+            self._event_playback_start_time = self._current_time
+            return
+        
+        # Calculate elapsed time since event started
+        elapsed = (self._current_time - self._event_playback_start_time).total_seconds()
+        
+        # If we've played for the duration, move to next event
+        if elapsed >= self._event_playback_duration:
+            # Move to next event
+            self._current_event_index = (self._current_event_index + 1) % len(self._event_summary)
+            
+            # If we've looped back to start, stop playback
+            if self._current_event_index == 0:
+                self._is_playing = False
+                carb.log_info("[TimeTravel] Event playback completed")
+                return
+            
+            # Go to next event and reset timer
+            self._go_to_current_event()
+            self._event_playback_start_time = self._current_time
+        else:
+            # Continue playing at normal speed
+            new_time = self._current_time + datetime.timedelta(seconds=dt)
+            self._current_time = new_time
+            self.update_stage_objects()
+    
+    def _go_to_current_event(self):
+        """Jump to current event in summary based on _current_event_index."""
         if not self._event_summary:
             return
         
-        self._current_event_index = (self._current_event_index + 1) % len(self._event_summary)
         event_timestamp = self._event_summary[self._current_event_index]
         
         try:
@@ -335,10 +377,20 @@ class TimeTravelCore:
         except Exception as e:
             carb.log_error(f"[TimeTravel] Failed to parse event timestamp: {event_timestamp}")
     
+    def _go_to_next_event(self):
+        """Jump to next event in summary."""
+        if not self._event_summary:
+            return
+        
+        self._current_event_index = (self._current_event_index + 1) % len(self._event_summary)
+        self._go_to_current_event()
+    
     def go_to_next_event(self):
-        """Manually jump to next event (for Go button)."""
+        """Manually jump to next event (for Next Event button)."""
         if self._event_summary:
             self._go_to_next_event()
+            # Reset event playback timer when manually jumping
+            self._event_playback_start_time = None
     
     # Getter methods for UI
     def get_start_time(self) -> datetime.datetime:
