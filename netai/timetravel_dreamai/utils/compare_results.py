@@ -193,7 +193,7 @@ def main():
     """
     
     # 예측 결과 파일 경로
-    prediction_file = Path(__file__).parent / "outputs" / "gpt_video_21_20251114_010528.json"
+    prediction_file = Path(__file__).parent.parent / "outputs" / "gpt_video_21_20251114_010528.json"
     
     # 파싱
     ground_truth = parse_ground_truth(ground_truth_text)
@@ -206,7 +206,7 @@ def main():
     print_comparison_report(precision, recall, f1, details)
     
     # 결과를 JSON으로도 저장
-    result_file = Path(__file__).parent / "compare_outputs" / "comparison_result.json"
+    result_file = Path(__file__).parent.parent / "compare_outputs" / "comparison_result.json"
     with open(result_file, 'w', encoding='utf-8') as f:
         json.dump({
             'metrics': {

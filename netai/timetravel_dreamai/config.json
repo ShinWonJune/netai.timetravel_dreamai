@@ -1,5 +1,5 @@
 {
-  "data_path": "./data/living_trajectory_60min_0.2s.csv",
+  "data_path": "./data/living_trajectory_1min_0.2s.csv",
   
   "auto_generate": true,
   
