@@ -566,7 +566,7 @@ class TimeTravelCore:
             vlm_data = load_json(str(json_path))
             events = consolidate_events(vlm_data, base_date="2025-01-01")
             
-            # Save processed JSONL
+            # Save processed JSONL to outputs directory
             output_jsonl = json_path.parent / f"{json_path.stem}_processed.jsonl"
             save_jsonl(events, str(output_jsonl))
             
@@ -582,8 +582,11 @@ class TimeTravelCore:
                 carb.log_error("[TimeTravel] No position data extracted")
                 return False
             
-            # Step 3: Save position data
-            position_jsonl = json_path.parent / f"{json_path.stem}_positions.jsonl"
+            # Step 3: Create Events directory and save position data
+            events_dir = json_path.parent.parent / "Events"
+            events_dir.mkdir(exist_ok=True)
+            
+            position_jsonl = events_dir / f"{json_path.stem}_positions.jsonl"
             
             with open(position_jsonl, 'w', encoding='utf-8') as f:
                 for entry in position_data:
