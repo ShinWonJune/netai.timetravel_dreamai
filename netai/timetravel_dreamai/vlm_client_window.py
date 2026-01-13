@@ -14,7 +14,7 @@ class VLMClientWindow:
         self._ext_id = ext_id
         
         # Create window
-        self._window = ui.Window("VLM Client", width=450, height=260)
+        self._window = ui.Window("VLM Client", width=450, height=285)
         
         with self._window.frame:
             with ui.VStack(spacing=5, style={"margin": 8}):
@@ -55,11 +55,17 @@ class VLMClientWindow:
                 
                 with ui.HStack(height=22, spacing=5):
                     ui.Label("Model:", width=50)
-                    self._model_combo = ui.ComboBox(1, "gpt-4o", "Qwen3-VL-8B-Instruct")
+                    self._model_combo = ui.ComboBox(1, "gpt-4o", "Qwen3-VL-8B-Instruct", "cosmos-reason1", "vila-1.5", "nvila")
                 
                 with ui.HStack(height=22, spacing=5):
                     ui.Label("Preset:", width=50)
                     self._preset_combo = ui.ComboBox(0, "simple_view", "twin_view")
+                
+                with ui.HStack(height=22, spacing=5):
+                    ui.Label("Overlap:", width=50)
+                    self._overlap_field = ui.IntField()
+                    self._overlap_field.model.set_value(0)
+                    ui.Label("sec", width=30)
                 
                 # Separator
                 with ui.HStack(height=1):
@@ -147,7 +153,7 @@ class VLMClientWindow:
         model_index = self._model_combo.model.get_item_value_model().as_int
         preset_index = self._preset_combo.model.get_item_value_model().as_int
         
-        models = ["gpt-4o", "Qwen3-VL-8B-Instruct"]
+        models = ["gpt-4o", "Qwen3-VL-8B-Instruct", "cosmos-reason1", "vila-1.5", "nvila"]
         presets = ["simple_view", "twin_view"]
         
         model = models[model_index]
@@ -161,12 +167,16 @@ class VLMClientWindow:
         # Get video filename for output naming
         video_filename = self._video_filename_field.model.get_value_as_string()
         
+        # Get chunk overlap duration
+        chunk_overlap = self._overlap_field.model.get_value_as_int()
+        
         # Run generation in separate thread to avoid blocking UI
         def generate_async():
             success, output_filename = self._vlm_core.generate_captions(
                 model=model,
                 preset_name=preset,
-                video_filename=video_filename
+                video_filename=video_filename,
+                chunk_overlap_duration=chunk_overlap
             )
             
             # Update UI with results (simple assignment is thread-safe for display)

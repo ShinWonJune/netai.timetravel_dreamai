@@ -1,9 +1,9 @@
 {
   "source_file": "Qwen3-VL-8B-Instruct_video_29_20251121_123955.json",
   "metrics": {
-    "precision": 0.15384615384615385,
-    "recall": 0.8571428571428571,
-    "f1_score": 0.2608695652173913
+    "precision": 0.14,
+    "recall": 0.86,
+    "f1_score": 0.24
   },
   "details": {
     "correct": [
@@ -133,11 +133,24 @@
       {
         "timestamp": "00:00:21",
         "predicted": [
+          1,
+          4
+        ]
+      },
+      {
+        "timestamp": "00:00:21",
+        "predicted": [
           3
         ]
       },
       {
         "timestamp": "00:00:22",
+        "predicted": [
+          3
+        ]
+      },
+      {
+        "timestamp": "00:00:23",
         "predicted": [
           3
         ]
@@ -257,6 +270,13 @@
       {
         "timestamp": "00:00:51",
         "predicted": [
+          2,
+          3
+        ]
+      },
+      {
+        "timestamp": "00:00:51",
+        "predicted": [
           3,
           4
         ]
@@ -297,6 +317,6 @@
         ]
       }
     ],
-    "incorrect_objects": []
+    "incorrect_predictions": []
   }
 }

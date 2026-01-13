@@ -67,17 +67,18 @@ class ObjectIDManipulator(sc.Manipulator):
             with sc.Transform(look_at=sc.Transform.LookAt.CAMERA):
                 # White circle background
                 sc.Arc(
-                    radius=40,  # DT VIEW
-                    # color=0xFFFFFFFF,  # 하얀색
-                    color=0xFF000000,  # 검은색
+                    radius=30,  # DT VIEW
+                    # radius=20,  # DT VIEW
+                    color=0xFFFFFFFF,  # 하얀색
+                    # color=0xFF000000,  # 검은색
                     thickness=40  # 꽉 찬 원을 만들기 위해 두껍게
                 )
                 # Draw label text on top
                 self._label = sc.Label(
                     self._label_text,
-                    # color=0xFF000000,  # DT VIEW Black text
-                    color=0xFFFFFFFF,  # SIMPLE VIEW White text
-                    size=18, #DT VIEW
+                    color=0xFF000000,  # DT VIEW Black text
+                    # color=0xFFFFFFFF,  # SIMPLE VIEW White text
+                    size=30, #DT VIEW 18
                     alignment=ui.Alignment.CENTER
                 )
         

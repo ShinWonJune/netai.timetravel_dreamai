@@ -92,7 +92,7 @@ class TimeTravelWindow:
                 # Current stage time display
                 with ui.HStack(height=25):
                     ui.Label("Stage Time:", width=80, style={"font_size": 14, "font_weight": "bold"})
-                    self._stage_time_label = ui.Label("", style={"font_size": 14, "color": 0xFF00AA00})
+                    self._stage_time_label = ui.Label("", style={"font_size": 20, "color": 0xFF00AA00})
                 
                 # Playback controls
                 with ui.HStack(height=30):

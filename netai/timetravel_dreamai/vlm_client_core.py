@@ -92,8 +92,9 @@ For each overlap, extract:
 Return your answer **only** in the following JSON format:
 
 [
-  {"HH:MM:SS": [3, 5]},
-  {"HH:MM:SS": [1, 2, 4]}
+  {"HH:MM:SS": [object_number_1, object_number_2, ...]},
+  {"HH:MM:SS": [object_number_1, object_number_2, ...]},
+...
 ]
 """),
                     system_prompt=("""
@@ -130,6 +131,7 @@ Do not include any reasoning or description; output **only** the JSON results.
             self._client = VSSClient(
                 base_url=base_url,
                 default_chunk_duration=2,
+                default_chunk_overlap_duration=0,
                 prompt_presets=presets,
             )
             
@@ -219,7 +221,8 @@ Do not include any reasoning or description; output **only** the JSON results.
         self,
         model: str = "Qwen3-VL-8B-Instruct",
         preset_name: str = "simple_view",
-        video_filename: Optional[str] = None
+        video_filename: Optional[str] = None,
+        chunk_overlap_duration: int = 0
     ) -> tuple[bool, Optional[str]]:
         """
         Generate VLM captions for current video.
@@ -228,6 +231,7 @@ Do not include any reasoning or description; output **only** the JSON results.
             model: VLM model name (default: "gpt-4o")
             preset_name: Prompt preset name (default: "simple_view")
             video_filename: Optional video filename for output naming
+            chunk_overlap_duration: Chunk overlap duration in seconds (default: 0)
             
         Returns:
             Tuple of (success: bool, output_filename: Optional[str])
@@ -243,12 +247,14 @@ Do not include any reasoning or description; output **only** the JSON results.
         try:
             carb.log_info(f"[VLMClient] Generating captions for video ID: {self._current_video_id}")
             carb.log_info(f"[VLMClient] Model: {model}, Preset: {preset_name}")
+            carb.log_info(f"[VLMClient] Chunk overlap duration: {chunk_overlap_duration}s")
             
             # Generate captions
             response = self._client.generate_vlm_captions(
                 video_id=self._current_video_id,
                 model=model,
-                preset_name=preset_name
+                preset_name=preset_name,
+                chunk_overlap_duration=chunk_overlap_duration
             )
             
             # Store response

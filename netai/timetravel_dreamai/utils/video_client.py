@@ -30,16 +30,19 @@ class VSSClient:
         self,
         base_url: str,
         default_chunk_duration: int = 2,
+        default_chunk_overlap_duration: int = 0,
         prompt_presets: Optional[Dict[str, PromptPreset]] = None,
     ):
         """
         Args:
             base_url: VSS 서버 베이스 URL (예: "http://localhost:8000" 혹은 VIA_BACKEND 주소)
             default_chunk_duration: 별도 지정 없을 때 사용할 기본 chunk duration (초 단위)
+            default_chunk_overlap_duration: 별도 지정 없을 때 사용할 기본 chunk overlap duration (초 단위)
             prompt_presets: 이름으로 불러 쓸 프롬프트 프리셋 딕셔너리
         """
         self.base_url = base_url.rstrip("/")
         self.default_chunk_duration = default_chunk_duration
+        self.default_chunk_overlap_duration = default_chunk_overlap_duration
         self.prompt_presets: Dict[str, PromptPreset] = prompt_presets or {}
 
     # ------------------------------------------------------------------
@@ -107,6 +110,7 @@ class VSSClient:
         prompt: Optional[str] = None,
         system_prompt: Optional[str] = None,
         chunk_duration: Optional[int] = None,
+        chunk_overlap_duration: Optional[int] = None,
         response_format: str = "json_object",
         extra_params: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
@@ -120,6 +124,7 @@ class VSSClient:
             prompt: 직접 전달할 프롬프트 (preset보다 우선)
             system_prompt: 직접 전달할 시스템 프롬프트 (preset보다 우선)
             chunk_duration: 청크 길이(초). None이면 default_chunk_duration 사용
+            chunk_overlap_duration: 청크 겹침 길이(초). None이면 default_chunk_overlap_duration 사용
             response_format: 서버에서 지원하는 응답 포맷 (예: "json_object" / "text")
             extra_params: temperature, top_p 등 추가 파라미터를 딕셔너리로 전달
 
@@ -147,6 +152,7 @@ class VSSClient:
             )
 
         cd = chunk_duration if chunk_duration is not None else self.default_chunk_duration
+        cod = chunk_overlap_duration if chunk_overlap_duration is not None else self.default_chunk_overlap_duration
 
         payload: Dict[str, Any] = {
             # 서버 스펙에 따라 "id"가 리스트인지 단일 값인지 다를 수 있음.
@@ -156,6 +162,7 @@ class VSSClient:
             "prompt": final_prompt,
             "system_prompt": final_system_prompt,
             "chunk_duration": cd,
+            "chunk_overlap_duration": cod,
             "response_format": {"type": response_format}
         }
 
