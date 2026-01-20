@@ -9,7 +9,7 @@
 # its affiliates is strictly prohibited.
 
 [package]
-title = "Timetravel_dream_ai"
+title = "Time_Travel_Summarization"
 version = "0.1.0"  # Semantic Versioning is used: https://semver.org/
 description = "The simplest python UI extension example. Use it as a starting point for your extensions."
 category = "Example"  # How to categorize this in the Extension Manager
