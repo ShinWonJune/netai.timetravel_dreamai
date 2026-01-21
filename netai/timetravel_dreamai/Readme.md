@@ -158,10 +158,10 @@ core.py 에서 event_post_processing_core.py 를 import하여 데이터를 가�
 최종 Event list를 활용하여 사건 중심 요약을 생성.
 
 **사용법:**
-1.  Time Travel Window의 **Event based summary mode** 체크.
-2-1.  **Play**: 이벤트 리스트를 순회하며, 이벤트 발생 구간만 자동 재생.
+*  Time Travel Window의 **Event based summary mode** 체크.
+*  **Play**: 이벤트 리스트를 순회하며, 이벤트 발생 구간만 자동 재생.
     *   재생 길이: `core.py`의 `_event_playback_duration` 설정값 (기본 1초).
     *   화면 이동: 이벤트 발생 시공간(위치+시간)으로 Viewport 자동 이동.
-2-2.  **Next Event** (Pause 상태일때): 버튼 클릭 시 다음 이벤트 발생 직전 시점으로 점프.
+*  **Next Event** (Pause 상태일때): 버튼 클릭 시 다음 이벤트 발생 직전 시점으로 점프.
 
 ---
