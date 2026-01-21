@@ -41,11 +41,11 @@ python utils/trajectory_data_generater_XAI_Studio.py
 *   **data_path**: 생성된 궤적 데이터(.csv) 경로 지정
 *   **astronaut_usd**: Time Travel 객체로 사용할 USD 파일 경로 지정 (현재는 Astronaut USD 파일 사용 중)
 *   **auto_generate**: `true` 이면 Extension 초기화시 time travel 객체 자동 생성 (data_path의 objectID 수 만큼 생성)
-
+---
 ### 3. Extension Initialization
 USD Composer 실행 후 `Extension` 창에서 **Time Travel Summarization**을 찾아 활성화. (Extension ID: `netai.timetravel_dreamai`)
 *   실행 시 Time Travel, View Overlay, VLM Client, Event Post Processing 등 모든 모듈의 UI Window가 초기화됩니다.
-
+---
 ### 4. Time Travel 모듈: 디지털트윈 복원 및 탐색
 **기능:** 시계열 데이터를 기반으로 과거 상태를 재현하고 탐색.
 *   **자동 객체 생성**: 데이터 내 ID 개수만큼 객체(Astronaut) 생성 및 매핑.
@@ -54,7 +54,7 @@ USD Composer 실행 후 `Extension` 창에서 **Time Travel Summarization**을 �
 *   **Play/Speed**: 시간 흐름에 따른 재생 및 속도 조절.
 
 > **구현 파일:** `core.py`, `window.py`
-
+---
 ### 5. View Overlay: 렌더링된 장면에 객체 정보와 시간 정보를 오버레이
 **기능:** 복원된 디지털트윈 장면 위에 객체 정보(ID)와 현재 시간(Timestamp)을 오버레이함. 이는 VLM가 이벤트 발생 시간과 연루된 객체를 특정할 수 있도록 하기 위한 과정임.
 
@@ -62,7 +62,7 @@ USD Composer 실행 후 `Extension` 창에서 **Time Travel Summarization**을 �
 
 > **구현 파일:**
 > *   `view_overlay.py`, `overlay_control.py`
-
+---
 ### 6. Visual Abstraction & Temporal Acceleration (Optional)
 VLM의 추론 성능을 극대화하기 위해 디지털트윈 환경을 조정하는 단계.
 
@@ -74,7 +74,7 @@ VLM의 추론 성능을 극대화하기 위해 디지털트윈 환경을 조정�
 #### Temporal Acceleration (시간 가속)
 *   **목적:** VLM에 전달되는 동영상의 재생 속도를 가속하여(영상 길이를 단축하여) VLM 처리 속도 향상.
 *   **경험적 성능:** '충돌' 이벤트 검출 시 **3배속** 영상까지는 추론 성능 저하가 없었음. (이벤트 특성에 따라 조절 필요)
-
+---
 ### 7. 동영상 추출 (Movie Capture)
 VLM 서버로 전송할 영상을 생성합니다. **Movie Capture Extension** (내장 기능)을 사용.  
 현재 동영상 추출 단계가 파이프라인의 주요 병목구간.  
@@ -103,7 +103,7 @@ Frame rate 와 Cumstom Range end (second) 를 곱한 수 만큼의 이미지를 
 | :--- | :--- | :--- | :--- | :--- |
 | **1배속 (정속)** | 60초 | 60 | **0.33x** | Capture가 약 3분동안 진행되므로, 재생 속도를 1/3로 늦춰야 1배속 영상 생성됨 |
 | **3배속 (가속)** | 20초 | 20 | **1.0x** | 정속 재생으로 캡쳐 시, 결과적으로 약 3배 빠른 영상(Temporal Acceleration)이 생성됨 |
-
+---
 ### 8. VLM Client: 분석 요청 및 결과 수신
 생성된 영상을 VLM 서버(NVIDIA VSS)로 전송하고 추론 결과를 받음.
 VLM 서버에 동영상을 upload하고, 추론 요청(generate)하는 두 과정을 거침
@@ -121,7 +121,7 @@ VLM 서버에 동영상을 upload하고, 추론 요청(generate)하는 두 과�
 *   Upload -> Settings -> Genearte
 
 > **구현 파일:** `vlm_client_core.py`, `vlm_client_window.py`
-
+---
 ### 9. Event Post Processing: 결과 가공
 VLM의 output을 Time Travel 모듈에서 재생 가능한 형태(Event List)로 변환.
 core.py 에서 event_post_processing_core.py 를 import하여 데이터를 가공.(core.py 의 in-memory data를 활용해야하기 때문)
@@ -137,7 +137,7 @@ core.py 에서 event_post_processing_core.py 를 import하여 데이터를 가�
 Input JSON File에 파일 이름 복붙 -> Process Evetns 버튼
 
 > **구현 파일:** `core.py`, `event_post_processing_core.py`, `event_post_processing_window.py`
-
+---
 ### 10. Event-based Summarization Playback
 최종 Event list를 활용하여 사건 중심 요약을 생성.
 
