@@ -62,9 +62,12 @@ USD Composer 실행 후 `Extension` 창에서 **Time Travel Summarization**을 �
 ---
 ### 5. View Overlay
 
-**기능:** 복원된 디지털트윈 장면 위에 객체 정보(ID)와 현재 시간(Timestamp)을 오버레이함. 이는 VLM가 이벤트 발생 시간과 연루된 객체를 특정할 수 있도록 하기 위한 과정임.
+VLM이 이벤트 발생 시간과 연루된 객체를 특정할 수 있도록 하기 위한 visual prompting 과정
 
-**사용법:** timestamp, objectIDs overlay 체크박스 선택
+**기능:** 복원된 디지털트윈 장면 위에 객체 정보(ID)와 현재 시간(Timestamp)을 오버레이함. 
+
+**사용법:**  
+*   timestamp, objectIDs overlay 체크박스 선택
 
 > **구현 파일:**
 > *   `view_overlay.py`, `overlay_control.py`
@@ -76,17 +79,18 @@ VLM의 추론 성능을 극대화하기 위해 디지털트윈 환경을 조정�
 #### Visual Abstraction (시각적 단순화)
 *   **목적:** 불필요한 시각 정보를 줄여 VLM이 객체 상호작용에 집중하도록 함.
 *   **방법:** Omniverse Stage 창의 '눈(Eye)' 아이콘을 통해 Prim 그룹(Furniture, Equipment 등)을 비활성화.
-*   **단계 예시:** Full Digital Twin → Simplified (가구 제거) → Abstract (배경 제거, View Overlay만 유지)
+*   **단계 예시:** Full Digital Twin → Simplified (Equipment 제거) → Abstract (Equiptment + A_Exterior 제거, View Overlay만 유지)
 
 #### Temporal Acceleration (시간 가속)
 *   **목적:** VLM에 전달되는 동영상의 재생 속도를 가속하여(영상 길이를 단축하여) VLM 처리 속도 향상.
 *   **경험적 성능:** '충돌' 이벤트 검출 시 **3배속** 영상까지는 추론 성능 저하가 없었음. (이벤트 특성에 따라 조절 필요)
+*   시간 가속된 동영상 생성 방법은 "7. 동영상 추출" 에서 설명.
 ---
 ### 7. 동영상 추출 (Movie Capture)
 
-VLM 서버로 전송할 영상을 생성합니다. **Movie Capture Extension** (내장 기능)을 사용.  
-현재 동영상 추출 단계가 파이프라인의 주요 병목구간.  
-영상 전달을 스트리밍 방식으로 확장 필요함.(NVIDIA VSS가 RTSP를 지원함)
+**Movie Capture Extension** (내장 기능)을 사용하여 VLM 서버로 전송할 영상을 생성. 
+*현재 동영상 추출 단계가 파이프라인의 주요 병목구간.*
+*영상 전달을 스트리밍 방식으로 확장 필요함.(NVIDIA VSS가 RTSP를 지원함)*
 
 #### 📸 캡쳐 가이드
 Movie Capture의 고정된 캡쳐 FPS 특성상, 원하는 재생 속도의 동영상을 얻기 위해 **Time Travel 재생 속도 조절**이 필요함.
@@ -145,7 +149,7 @@ core.py 에서 event_post_processing_core.py 를 import하여 데이터를 가�
     3.  최종 결과물 `*_eventlist.jsonl` 생성 (경로: `event_list/`)
 
 **사용법:**
-Input JSON File에 파일 이름 복붙 -> Process Evetns 버튼
+*   Input JSON File에 파일 이름 복붙 -> Process Evetns 버튼
 
 > **구현 파일:** `core.py`, `event_post_processing_core.py`, `event_post_processing_window.py`
 ---
@@ -155,9 +159,9 @@ Input JSON File에 파일 이름 복붙 -> Process Evetns 버튼
 
 **사용법:**
 1.  Time Travel Window의 **Event based summary mode** 체크.
-2.  **Play**: 이벤트 리스트를 순회하며, 이벤트 발생 구간만 자동 재생.
+2-1.  **Play**: 이벤트 리스트를 순회하며, 이벤트 발생 구간만 자동 재생.
     *   재생 길이: `core.py`의 `_event_playback_duration` 설정값 (기본 1초).
     *   화면 이동: 이벤트 발생 시공간(위치+시간)으로 Viewport 자동 이동.
-3.  **Next Event** (Pause 상태일때): 버튼 클릭 시 다음 이벤트 발생 직전 시점으로 점프.
+2-2.  **Next Event** (Pause 상태일때): 버튼 클릭 시 다음 이벤트 발생 직전 시점으로 점프.
 
 ---
