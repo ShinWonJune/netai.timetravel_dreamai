@@ -1,7 +1,6 @@
 # Time Travel Summarization Extension
 
-이 문서는 **Time Travel Summarization Framework**를 구현한 **Time_travel_Summarization** Extension의 사용 설명서입니다.
-
+이 문서는 **Time Travel Summarization Framework**를 구현한 **Time_travel_Summarization** Extension의 사용 설명서입니다.  
 본 프레임워크는 시계열 궤적 데이터를 활용하여 디지털트윈의 과거 상태를 복원하고, 이를 기반으로 **Event-based Summarization** (현재 '충돌' 이벤트 지원)을 생성합니다.
 
 > **Extension ID:** `netai.timetravel_dreamai`
@@ -20,7 +19,7 @@
 
 ---
 
-## 🚀 사용 가이드 (Workflow)
+## 🚀 사용 가이드 (Workflow) 및 기능 설명
 
 프레임워크의 작동 순서에 따른 단계별 사용법.
 
@@ -75,8 +74,9 @@ VLM의 추론 성능을 극대화하기 위해 디지털트윈 환경을 조정�
 *   **경험적 성능:** '충돌' 이벤트 검출 시 **3배속** 영상까지는 추론 성능 저하가 없었음. (이벤트 특성에 따라 조절 필요)
 
 ### 7. 동영상 추출 (Movie Capture)
-VLM 서버로 전송할 영상을 생성합니다. **Movie Capture Extension** (내장 기능)을 사용.
-현재 동영상 추출 단계가 파이프라인의 주요 병목구간. 영상 전달을 스트리밍 방식으로 확장 필요함.(NVIDIA VSS가 RTSP를 지원함)
+VLM 서버로 전송할 영상을 생성합니다. **Movie Capture Extension** (내장 기능)을 사용.  
+현재 동영상 추출 단계가 파이프라인의 주요 병목구간.  
+영상 전달을 스트리밍 방식으로 확장 필요함.(NVIDIA VSS가 RTSP를 지원함)
 
 #### 📸 캡쳐 가이드
 Movie Capture의 고정된 캡쳐 FPS 특성상, 원하는 재생 속도의 동영상을 얻기 위해 **Time Travel 재생 속도 조절**이 필요함.
@@ -91,10 +91,10 @@ Movie Capture의 고정된 캡쳐 FPS 특성상, 원하는 재생 속도의 동�
     
 
 #### 재생 속도 설정 공식
-Movie Capture는 기본적으로 10 FPS 로 캡쳐를 진행함.
-Frame rate 와 Cumstom Range end (second) 를 곱한 수 만큼의 이미지를 10FPS 속도로 캡쳐한 뒤 동영상 인코딩.
-예를 들어, 30FPS, 60초 Capture range 설정을 하면, 30x60 = 1800 장의 이미지를 10FPS로 촬영함.
-따라서 1800/10 = 180초가 소요. 그러므로 Time Travel 재생 속도를 0.33x 로 설정하여 3분동안 시뮬레이션(재생)이 진행되도록 조절해야 60초 길이의 동영상을 생성할 수 있음.
+Movie Capture는 기본적으로 10 FPS 로 캡쳐를 진행함.  
+Frame rate 와 Cumstom Range end (second) 를 곱한 수 만큼의 이미지를 10FPS 속도로 캡쳐한 뒤 동영상 인코딩.  
+예를 들어, 30FPS, 60초 Capture range 설정을 하면, 30x60 = 1800 장의 이미지를 10FPS로 촬영함.  
+따라서 1800/10 = 180초가 소요. 그러므로 Time Travel 재생 속도를 0.33x 로 설정하여 3분동안 시뮬레이션(재생)이 진행되도록 조절해야 60초 길이의 동영상을 생성할 수 있음.  
 1분(60초) 분량의 데이터를 캡쳐할 때 권장 설정은 다음과 같음.
 
 | 목표 영상 속도 | 결과 영상 길이 | Custom Range End | **Time Travel Play Speed** | 설정 이유 |
