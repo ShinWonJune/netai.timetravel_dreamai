@@ -25,7 +25,11 @@
 
 ### 0. VLM 서버 실행
 
-VLM 서버를 실행합니다. NVIDIA VSS (동영상 데이터 전달 파이프라인) 와 VLM container로 구성.
+VLM 서버를 실행합니다. 
+서버에서 VLM container와 Video process pipeline (NVIDIA VSS) 를 각자 실행.  
+GPU는 SV4000-2 기준으로 l40 또는 A100 40GB 한대로 충분.
+
+자세한 내용은 `./VLM_server` 디렉토리 README.md에서 확인
 
 ---
 ### 1. 궤적 데이터 생성
