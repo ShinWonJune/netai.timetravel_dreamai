@@ -141,6 +141,8 @@ VLM 서버에 동영상을 upload하고, 추론 요청(generate)하는 두 과�
 *   Upload -> Settings -> Genearte
 
 > **구현 파일:** `vlm_client_core.py`, `vlm_client_window.py`
+*   동영상 청크 길이는 `vlm_client_core.py`의 `default_chunk_duration` 에서 설정 가능
+*   chunk 당 frame 개수는 vlm server에서 설정
 ---
 ### 9. Event Post Processing
 

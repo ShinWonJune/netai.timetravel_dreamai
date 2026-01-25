@@ -1,5 +1,6 @@
 """
 VLM 서버에 동영상을 업로드하고, VLM 분석을 요청하고, 결과를 저장하는 `VLM Client module` 의 core.
+default_chunk_duration=2 초, default_chunk_overlap_duration=0 초로 설정됨.
 """
 
 import os
