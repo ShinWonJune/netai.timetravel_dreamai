@@ -1,6 +1,6 @@
 # Time Travel Summarization Extension
 
-이 문서는  **Time Travel Summarization Framework**를 구현한 **Time_travel_Summarization** Extension의 사용 설명서입니다.  
+이 문서는  **Time Travel Summarization Framework**를 구현한 **Time_travel_Summarization** Extension의 사용 설명서입니다.
 본 프레임워크는 Dream-AI_Plus_Twin.usd를 기반으로 구현되었으며 시계열 궤적 데이터를 활용하여 디지털트윈의 과거 상태를 복원하고, 이를 기반으로 **Event-based Summarization** (현재 '충돌' 이벤트 지원)을 생성합니다.
 
 > **Extension ID:** `netai.timetravel_dreamai`
@@ -15,6 +15,23 @@
 *   **익스텐션 구조**:
     *   익스텐션은 다양한 모듈로 구성되며 `extension.py`를 통해 통합 초기화.
     *   모듈: Time Travel, View overlay, Vlm Client, Event Post-Processing
+
+## Extension 설치 가이드
+
+### 1. USD Composer 설치
+
+*   Omniverse kit-app-template 레포(https://github.com/NVIDIA-Omniverse/kit-app-template.git)를 clone 한다. 
+*   레포지토리의 **Prerequisits and Environment Setup** 을 따라 **USD COmposer** 설치한다.
+*   **새로운 어플리케이션을 생성하는 과정(.\repo.bat template new)에서 `? Do you want to add application layers? [ENTER to confirm]` 에서 `Yes`  를 선택한 뒤 `[omni_default_streaming]: Omniverse Kit App Streaming (Default)` 를 체크하여 설치한다.** (선택하지 않을 시 뷰포트 로드가 불가한 에러 발생)
+*   USD Composer를 빌드한다. (`.\repo.bat build` for window, `.\repo.sh build` for linux)
+
+### 2. Extenson 설치
+*   kit-app-template/source/extension 경로에 Time Travel Summarization github repository를 clone 한다. (https://github.com/ShinWonJune/netai.time_travel_summarization.git)
+
+### 3. USD Composer 실행
+*   USD Composer를 실행한다. (`.\repo.bat launch`)
+*   Developer/Extension의 검색창에 `netai` 검색
+*   `NVIDIA`의 `Sample` 항목에서 `TIME_TRAVEL_SUMMARIZATION` 활성화
 
 
 ---
